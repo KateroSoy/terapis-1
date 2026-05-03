@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  Receipt, 
   Search, 
   Filter, 
   Download, 
@@ -17,11 +16,26 @@ import { formatCurrency, formatDate } from '../lib/utils';
 import { cn } from '../lib/utils';
 
 export const Invoices: React.FC = () => {
-  const { invoices, activeBranchId } = useApp();
+  const { invoices, patients, activeBranchId } = useApp();
 
   const filteredInvoices = activeBranchId === 'ALL'
     ? invoices
     : invoices.filter(i => i.branchId === activeBranchId);
+
+  // Helper: look up patient name safely, never crash
+  const getPatientName = (patientId: string): string => {
+    return patients.find(p => p.id === patientId)?.name ?? 'Pasien Tidak Diketahui';
+  };
+
+  const totalLunas = filteredInvoices
+    .filter(i => i.status === 'Lunas')
+    .reduce((acc, i) => acc + i.amount, 0);
+
+  const totalPending = filteredInvoices
+    .filter(i => i.status !== 'Lunas')
+    .reduce((acc, i) => acc + i.amount, 0);
+
+  const totalAll = filteredInvoices.reduce((acc, i) => acc + i.amount, 0);
 
   return (
     <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -45,20 +59,26 @@ export const Invoices: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <GlassCard className="bg-gradient-to-br from-emerald-500 to-teal-400 border-none text-white p-6">
           <p className="text-white/70 text-[10px] uppercase font-bold tracking-widest mb-1">Total Tertagih</p>
-          <h3 className="text-2xl font-bold font-display">Rp 128.450.000</h3>
+          <h3 className="text-2xl font-bold font-display">{formatCurrency(totalAll)}</h3>
           <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold bg-white/20 w-fit px-2 py-1 rounded-lg">
             <ArrowUpRight size={12} /> +8.2% vs bulan lalu
           </div>
         </GlassCard>
         <GlassCard className="bg-gradient-to-br from-amber-500 to-orange-400 border-none text-white p-6">
           <p className="text-white/70 text-[10px] uppercase font-bold tracking-widest mb-1">Belum Lunas</p>
-          <h3 className="text-2xl font-bold font-display">Rp 42.100.000</h3>
-          <p className="mt-4 text-[10px] font-bold opacity-80">Dari 12 Invoice Pending</p>
+          <h3 className="text-2xl font-bold font-display">{formatCurrency(totalPending)}</h3>
+          <p className="mt-4 text-[10px] font-bold opacity-80">
+            Dari {filteredInvoices.filter(i => i.status !== 'Lunas').length} Invoice Pending
+          </p>
         </GlassCard>
         <GlassCard className="bg-gradient-to-br from-blue-500 to-indigo-400 border-none text-white p-6">
           <p className="text-white/70 text-[10px] uppercase font-bold tracking-widest mb-1">Sudah Lunas</p>
-          <h3 className="text-2xl font-bold font-display">Rp 86.350.000</h3>
-          <p className="mt-4 text-[10px] font-bold opacity-80">68% dari total target bulan ini</p>
+          <h3 className="text-2xl font-bold font-display">{formatCurrency(totalLunas)}</h3>
+          <p className="mt-4 text-[10px] font-bold opacity-80">
+            {filteredInvoices.length > 0
+              ? `${Math.round((filteredInvoices.filter(i => i.status === 'Lunas').length / filteredInvoices.length) * 100)}% dari total invoice`
+              : 'Belum ada data'}
+          </p>
         </GlassCard>
       </div>
 
@@ -84,53 +104,72 @@ export const Invoices: React.FC = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50">
-                <th className="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Invoice ID</th>
+                <th className="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">No. Invoice</th>
                 <th className="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Pasien</th>
                 <th className="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Tanggal</th>
                 <th className="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Jumlah</th>
+                <th className="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Metode</th>
                 <th className="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">Status</th>
                 <th className="py-4 px-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredInvoices.map((invoice) => (
-                <tr key={invoice.id} className="group hover:bg-blue-50/30 transition-colors">
-                  <td className="py-5 px-6">
-                    <span className="text-sm font-bold text-slate-900">#{invoice.id.split('-')[0].toUpperCase()}</span>
-                  </td>
-                  <td className="py-5 px-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-[10px]">
-                        {invoice.patientName.charAt(0)}
+              {filteredInvoices.map((invoice) => {
+                // Safely look up patient name — NEVER directly access invoice.patientName
+                const patientName = getPatientName(invoice.patientId);
+                const initial = patientName.charAt(0).toUpperCase();
+
+                return (
+                  <tr key={invoice.id} className="group hover:bg-blue-50/30 transition-colors">
+                    <td className="py-5 px-6">
+                      <span className="text-sm font-bold text-slate-900">{invoice.invoiceNumber}</span>
+                    </td>
+                    <td className="py-5 px-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-[10px] shrink-0">
+                          {initial}
+                        </div>
+                        <span className="text-sm font-bold text-slate-700 uppercase tracking-tight">{patientName}</span>
                       </div>
-                      <span className="text-sm font-bold text-slate-700 uppercase tracking-tight">{invoice.patientName}</span>
-                    </div>
-                  </td>
-                  <td className="py-5 px-6">
-                    <span className="text-xs font-medium text-slate-500">{formatDate(invoice.date)}</span>
-                  </td>
-                  <td className="py-5 px-6">
-                    <span className="text-sm font-bold text-slate-900">{formatCurrency(invoice.total)}</span>
-                  </td>
-                  <td className="py-5 px-6">
-                    <span className={cn(
-                      "text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 w-fit",
-                      invoice.status === 'Lunas' ? "bg-emerald-100 text-emerald-700" :
-                      invoice.status === 'Belum Lunas' ? "bg-amber-100 text-amber-700" :
-                      "bg-rose-100 text-rose-700"
-                    )}>
-                      {invoice.status === 'Lunas' ? <CheckCircle2 size={12} /> : 
-                       invoice.status === 'Belum Lunas' ? <Clock size={12} /> : <AlertCircle size={12} />}
-                      {invoice.status}
-                    </span>
-                  </td>
-                  <td className="py-5 px-6 text-right">
-                    <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
-                      <MoreHorizontal size={18} />
-                    </button>
+                    </td>
+                    <td className="py-5 px-6">
+                      <span className="text-xs font-medium text-slate-500">{formatDate(invoice.date)}</span>
+                    </td>
+                    <td className="py-5 px-6">
+                      {/* Use invoice.amount — the correct field per Invoice type */}
+                      <span className="text-sm font-bold text-slate-900">{formatCurrency(invoice.amount)}</span>
+                    </td>
+                    <td className="py-5 px-6">
+                      <span className="text-xs font-medium text-slate-500">{invoice.paymentMethod ?? '—'}</span>
+                    </td>
+                    <td className="py-5 px-6">
+                      <span className={cn(
+                        "text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 w-fit",
+                        invoice.status === 'Lunas' ? "bg-emerald-100 text-emerald-700" :
+                        invoice.status === 'Belum Lunas' ? "bg-amber-100 text-amber-700" :
+                        "bg-rose-100 text-rose-700"
+                      )}>
+                        {invoice.status === 'Lunas' ? <CheckCircle2 size={12} /> : 
+                         invoice.status === 'Belum Lunas' ? <Clock size={12} /> : <AlertCircle size={12} />}
+                        {invoice.status}
+                      </span>
+                    </td>
+                    <td className="py-5 px-6 text-right">
+                      <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
+                        <MoreHorizontal size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+
+              {filteredInvoices.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="py-16 text-center text-slate-400 text-sm font-medium">
+                    Belum ada data invoice.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
