@@ -7,6 +7,14 @@ import { Patients } from './pages/Patients';
 import { Booking } from './pages/Booking';
 import { Branches } from './pages/Branches';
 import { LandingPage } from './pages/LandingPage';
+import { Schedule } from './pages/Schedule';
+import { MedicalRecords } from './pages/MedicalRecords';
+import { Therapists } from './pages/Therapists';
+import { Cashier } from './pages/Cashier';
+import { Invoices } from './pages/Invoices';
+import { Packages } from './pages/Packages';
+import { FinancialReports } from './pages/FinancialReports';
+import { Settings } from './pages/Settings';
 import { AppProvider } from './context/AppContext';
 
 const AdminLayout = () => {
@@ -23,13 +31,6 @@ const AdminLayout = () => {
   );
 };
 
-const PlaceholderPage = ({ title }: { title: string }) => (
-  <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] text-slate-400">
-    <h2 className="text-2xl font-bold uppercase tracking-widest">{title}</h2>
-    <p className="font-medium mt-2">Segera Hadir: Modul Lengkap {title} multi-cabang.</p>
-  </div>
-);
-
 export default function App() {
   return (
     <AppProvider>
@@ -41,14 +42,14 @@ export default function App() {
             <Route path="bookings" element={<Booking />} />
             <Route path="patients" element={<Patients />} />
             <Route path="branches" element={<Branches />} />
-            <Route path="schedule" element={<PlaceholderPage title="Jadwal Terapi" />} />
-            <Route path="medical-records" element={<PlaceholderPage title="Rekam Medis" />} />
-            <Route path="therapists" element={<PlaceholderPage title="Data Terapis" />} />
-            <Route path="cashier" element={<PlaceholderPage title="Kasir / POS" />} />
-            <Route path="invoices" element={<PlaceholderPage title="Daftar Invoice" />} />
-            <Route path="packages" element={<PlaceholderPage title="Paket Terapi" />} />
-            <Route path="reports" element={<PlaceholderPage title="Laporan Keuangan" />} />
-            <Route path="settings" element={<PlaceholderPage title="Pengaturan Sistem" />} />
+            <Route path="schedule" element={<Schedule />} />
+            <Route path="medical-records" element={<MedicalRecords />} />
+            <Route path="therapists" element={<Therapists />} />
+            <Route path="cashier" element={<Cashier />} />
+            <Route path="invoices" element={<Invoices />} />
+            <Route path="packages" element={<Packages />} />
+            <Route path="reports" element={<FinancialReports />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
