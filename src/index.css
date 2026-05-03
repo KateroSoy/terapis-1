@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", "Inter", sans-serif;
+  
+  --color-medical-primary: #155EEF;
+  --color-medical-secondary: #172B4D;
+  --color-medical-accent: #7EE7F2;
+  --color-medical-success: #42C7A5;
+  --color-medical-bg: #F7FBFC;
+}
+
+@layer base {
+  body {
+    @apply bg-medical-bg text-slate-900 font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl shadow-blue-900/5;
+  }
+}
