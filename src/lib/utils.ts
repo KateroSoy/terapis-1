@@ -12,3 +12,11 @@ export function formatCurrency(value: number) {
     minimumFractionDigits: 0,
   }).format(value);
 }
+
+export function formatDate(date: string | Date) {
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(date));
+}
