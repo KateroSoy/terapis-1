@@ -133,7 +133,9 @@ export const LandingPage: React.FC = () => {
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 glass-effect border-b border-white/20 px-8 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-medical-primary rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-200 font-display">K</div>
+          <div className="w-9 h-9 bg-medical-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+            <Building2 size={20} />
+          </div>
           <span className="text-xl font-bold tracking-tight font-display text-medical-secondary">KlinikTerapis<span className="text-medical-primary">Pro</span></span>
         </div>
         <div className="hidden md:flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-slate-500">
@@ -761,7 +763,9 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
           <div className="space-y-6">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl">K</div>
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
+                <Building2 size={24} />
+              </div>
               <span className="text-xl font-bold tracking-tight">KlinikTerapisPro</span>
             </div>
             <p className="text-slate-500 text-sm font-medium leading-relaxed">

@@ -108,7 +108,9 @@ export const OnlineRegistration: React.FC = () => {
       >
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">K</div>
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+              <Building2 size={24} />
+            </div>
             <span className="text-2xl font-bold tracking-tight text-slate-900">KlinikTerapis<span className="text-blue-600">Pro</span></span>
           </div>
           <h2 className="text-3xl font-black tracking-tight mb-2">Daftar Pasien Baru & Booking</h2>
