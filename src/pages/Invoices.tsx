@@ -1,28 +1,32 @@
-import React from 'react';
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  Plus, 
-  CheckCircle2, 
-  Clock, 
+import React, { useState } from 'react';
+import {
+  Search,
+  Filter,
+  Download,
+  Plus,
+  CheckCircle2,
+  Clock,
   AlertCircle,
   MoreHorizontal,
-  ArrowUpRight
+  ArrowUpRight,
+  CreditCard,
+  Eye,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { GlassCard } from '../components/common/GlassCard';
+import { PaymentModal } from '../components/modals/PaymentModal';
 import { formatCurrency, formatDate } from '../lib/utils';
 import { cn } from '../lib/utils';
+import { PaymentTransaction } from '../types';
 
 export const Invoices: React.FC = () => {
-  const { invoices, patients, activeBranchId } = useApp();
+  const { invoices, patients, activeBranchId, updateInvoiceStatus } = useApp();
+  const [payingInvoice, setPayingInvoice] = useState<{ id: string; number: string; amount: number; patientName: string } | null>(null);
 
   const filteredInvoices = activeBranchId === 'ALL'
     ? invoices
     : invoices.filter(i => i.branchId === activeBranchId);
 
-  // Helper: look up patient name safely, never crash
   const getPatientName = (patientId: string): string => {
     return patients.find(p => p.id === patientId)?.name ?? 'Pasien Tidak Diketahui';
   };
@@ -36,6 +40,12 @@ export const Invoices: React.FC = () => {
     .reduce((acc, i) => acc + i.amount, 0);
 
   const totalAll = filteredInvoices.reduce((acc, i) => acc + i.amount, 0);
+
+  const handlePaymentSuccess = (transaction: PaymentTransaction) => {
+    if (payingInvoice) {
+      updateInvoiceStatus(payingInvoice.id, 'Lunas', transaction.method);
+    }
+  };
 
   return (
     <div className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -88,9 +98,9 @@ export const Invoices: React.FC = () => {
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
               <Search size={18} />
             </div>
-            <input 
-              type="text" 
-              placeholder="Cari nomor invoice atau nama pasien..." 
+            <input
+              type="text"
+              placeholder="Cari nomor invoice atau nama pasien..."
               className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-50 transition-all text-sm font-medium"
             />
           </div>
@@ -115,9 +125,9 @@ export const Invoices: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredInvoices.map((invoice) => {
-                // Safely look up patient name — NEVER directly access invoice.patientName
                 const patientName = getPatientName(invoice.patientId);
                 const initial = patientName.charAt(0).toUpperCase();
+                const isUnpaid = invoice.status === 'Belum Lunas' || invoice.status === 'Jatuh Tempo';
 
                 return (
                   <tr key={invoice.id} className="group hover:bg-blue-50/30 transition-colors">
@@ -136,28 +146,50 @@ export const Invoices: React.FC = () => {
                       <span className="text-xs font-medium text-slate-500">{formatDate(invoice.date)}</span>
                     </td>
                     <td className="py-5 px-6">
-                      {/* Use invoice.amount — the correct field per Invoice type */}
                       <span className="text-sm font-bold text-slate-900">{formatCurrency(invoice.amount)}</span>
                     </td>
                     <td className="py-5 px-6">
-                      <span className="text-xs font-medium text-slate-500">{invoice.paymentMethod ?? '—'}</span>
+                      <span className="text-xs font-medium text-slate-500">
+                        {invoice.paymentMethod
+                          ? getPaymentMethodDisplay(invoice.paymentMethod)
+                          : '—'
+                        }
+                      </span>
                     </td>
                     <td className="py-5 px-6">
                       <span className={cn(
                         "text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 w-fit",
                         invoice.status === 'Lunas' ? "bg-emerald-100 text-emerald-700" :
                         invoice.status === 'Belum Lunas' ? "bg-amber-100 text-amber-700" :
-                        "bg-rose-100 text-rose-700"
+                        invoice.status === 'Jatuh Tempo' ? "bg-rose-100 text-rose-700" :
+                        "bg-slate-100 text-slate-500"
                       )}>
-                        {invoice.status === 'Lunas' ? <CheckCircle2 size={12} /> : 
-                         invoice.status === 'Belum Lunas' ? <Clock size={12} /> : <AlertCircle size={12} />}
+                        {invoice.status === 'Lunas' ? <CheckCircle2 size={12} /> :
+                         invoice.status === 'Belum Lunas' ? <Clock size={12} /> :
+                         invoice.status === 'Jatuh Tempo' ? <AlertCircle size={12} /> : null}
                         {invoice.status}
                       </span>
                     </td>
                     <td className="py-5 px-6 text-right">
-                      <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
-                        <MoreHorizontal size={18} />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        {isUnpaid && (
+                          <button
+                            onClick={() => setPayingInvoice({
+                              id: invoice.id,
+                              number: invoice.invoiceNumber,
+                              amount: invoice.amount,
+                              patientName,
+                            })}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition-all shadow-sm"
+                          >
+                            <CreditCard size={12} />
+                            Bayar
+                          </button>
+                        )}
+                        <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
+                          <Eye size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -174,6 +206,30 @@ export const Invoices: React.FC = () => {
           </table>
         </div>
       </GlassCard>
+
+      {/* Payment Modal */}
+      {payingInvoice && (
+        <PaymentModal
+          isOpen={!!payingInvoice}
+          onClose={() => setPayingInvoice(null)}
+          amount={payingInvoice.amount}
+          invoiceId={payingInvoice.id}
+          invoiceNumber={payingInvoice.number}
+          patientName={payingInvoice.patientName}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
+      )}
     </div>
   );
 };
+
+function getPaymentMethodDisplay(method: string): string {
+  const map: Record<string, string> = {
+    qris: '📱 QRIS',
+    gopay: '🟢 GoPay',
+    ovo: '🟣 OVO',
+    bank_transfer: '🏦 Transfer',
+    tunai: '💵 Tunai',
+  };
+  return map[method] ?? method;
+}

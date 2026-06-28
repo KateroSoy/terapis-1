@@ -73,6 +73,27 @@ export interface MedicalRecord {
   homeExercise: string;
 }
 
+export type PaymentMethod = 'qris' | 'gopay' | 'ovo' | 'bank_transfer' | 'tunai';
+
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  qty: number;
+}
+
+export interface PaymentTransaction {
+  id: string;
+  invoiceId: string;
+  orderId: string;
+  amount: number;
+  method: PaymentMethod;
+  status: 'pending' | 'success' | 'failed' | 'expired';
+  qrCode?: string;
+  paidAt?: string;
+  createdAt: string;
+}
+
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -81,7 +102,9 @@ export interface Invoice {
   amount: number;
   date: string;
   status: 'Lunas' | 'Belum Lunas' | 'Jatuh Tempo' | 'Dibatalkan';
-  paymentMethod?: string;
+  paymentMethod?: PaymentMethod | string;
+  items?: CartItem[];
+  transactionId?: string;
 }
 
 export interface TherapyPackage {

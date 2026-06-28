@@ -15,6 +15,7 @@ import { Invoices } from './pages/Invoices';
 import { Packages } from './pages/Packages';
 import { FinancialReports } from './pages/FinancialReports';
 import { Settings } from './pages/Settings';
+import { OnlineRegistration } from './pages/OnlineRegistration';
 import { AppProvider } from './context/AppContext';
 
 const AdminLayout = () => {
@@ -37,6 +38,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/daftar" element={<OnlineRegistration />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="bookings" element={<Booking />} />

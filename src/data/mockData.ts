@@ -173,7 +173,7 @@ export const PATIENTS: Patient[] = [
     lastBranchId: 'c4',
     therapyType: 'Rehab Medik',
     lastVisit: '2026-10-30',
-    status: 'Evaluasi Lanjut',
+    status: 'Evaluasi',
     outstandingBill: 0,
     totalSessions: 12,
   },
@@ -246,7 +246,7 @@ export const BOOKINGS: Booking[] = [
     roomId: 'Room B1',
     date: '2026-11-02',
     time: '15:30',
-    status: 'Sedang Berjalan',
+    status: 'Terkonfirmasi',
     paymentStatus: 'Lunas',
   },
   {
