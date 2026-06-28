@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Calendar, User, Phone, MapPin, Building2, CheckCircle2, Clock } from 'lucide-react';
+import { Calendar, User, Phone, MapPin, Building2, CheckCircle2, Clock, Loader2 } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export const OnlineRegistration: React.FC = () => {
   const navigate = useNavigate();
   const { clinics, therapists, addPatient, addBooking } = useApp();
   const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -24,12 +26,15 @@ export const OnlineRegistration: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    // Add Patient
-    const newPatient = addPatient({
-      name: formData.name,
-      age: parseInt(formData.age),
-      gender: formData.gender,
+    // Simulate API call delay
+    setTimeout(() => {
+      // Add Patient
+      const newPatient = addPatient({
+        name: formData.name,
+        age: parseInt(formData.age),
+        gender: formData.gender,
       phone: formData.phone,
       address: formData.address,
       primaryBranchId: formData.branchId,
@@ -58,16 +63,27 @@ export const OnlineRegistration: React.FC = () => {
       paymentStatus: 'Belum Bayar',
     });
 
+    setIsSubmitting(false);
     setSuccess(true);
+    }, 1500);
   };
 
   if (success) {
     return (
       <div className="min-h-screen bg-[#F7FBFC] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 text-center shadow-2xl shadow-blue-900/5">
-          <div className="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full bg-white rounded-3xl p-8 text-center shadow-2xl shadow-blue-900/5"
+        >
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", delay: 0.2 }}
+            className="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
             <CheckCircle2 size={40} />
-          </div>
+          </motion.div>
           <h2 className="text-2xl font-black text-slate-900 mb-2">Pendaftaran Berhasil!</h2>
           <p className="text-slate-500 mb-8">
             Terima kasih telah mendaftar. Tim kami akan segera menghubungi Anda melalui WhatsApp untuk konfirmasi jadwal.
@@ -78,16 +94,20 @@ export const OnlineRegistration: React.FC = () => {
           >
             Kembali ke Beranda
           </button>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#F7FBFC] py-12 px-4 sm:px-6 lg:px-8 font-sans text-slate-900">
-      <div className="max-w-2xl mx-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-2xl mx-auto"
+      >
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 mb-4 cursor-pointer" onClick={() => navigate('/')}>
+          <div className="inline-flex items-center gap-2 mb-4 cursor-pointer hover:scale-105 transition-transform" onClick={() => navigate('/')}>
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">K</div>
             <span className="text-2xl font-bold tracking-tight text-slate-900">KlinikTerapis<span className="text-blue-600">Pro</span></span>
           </div>
@@ -232,16 +252,23 @@ export const OnlineRegistration: React.FC = () => {
           <div className="pt-6">
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-blue-600/20 active:scale-[0.98]"
+              disabled={isSubmitting}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-4 rounded-xl font-black text-lg transition-all shadow-xl shadow-blue-600/20 active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              Daftar & Booking Jadwal
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={24} className="animate-spin" /> Memproses...
+                </>
+              ) : (
+                'Daftar & Booking Jadwal'
+              )}
             </button>
             <p className="text-center text-xs text-slate-400 mt-4">
               Dengan mendaftar, Anda menyetujui syarat & ketentuan KlinikTerapisPro
             </p>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };
