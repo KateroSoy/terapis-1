@@ -27,8 +27,6 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell
 } from 'recharts';
-import { PaymentModal } from '../components/modals/PaymentModal';
-import { PaymentTransaction } from '../types';
 
 const TOTAL_REVENUE = 161300000;
 const TOTAL_PATIENTS = 982;
@@ -111,22 +109,6 @@ function formatCurrencyShort(value: number) {
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const [subPayment, setSubPayment] = useState<{
-    isOpen: boolean;
-    pkg: { name: string; price: number; period: string; label: string } | null;
-  }>({ isOpen: false, pkg: null });
-  const [subSuccess, setSubSuccess] = useState(false);
-
-  const handleBuyPackage = (name: string, price: number, period: string, label: string) => {
-    setSubPayment({ isOpen: true, pkg: { name, price, period, label } });
-    setSubSuccess(false);
-  };
-
-  const handleSubPaymentSuccess = (_transaction: PaymentTransaction) => {
-    setSubSuccess(true);
-    setSubPayment({ isOpen: false, pkg: null });
-    setTimeout(() => setSubSuccess(false), 5000);
-  };
 
   return (
     <div className="min-h-screen bg-[#F7FBFC] font-sans text-[#1C2630] overflow-x-hidden">
@@ -141,7 +123,6 @@ export const LandingPage: React.FC = () => {
         <div className="hidden md:flex items-center gap-8 text-[11px] font-black uppercase tracking-widest text-slate-500">
           <a href="#analytics" className="hover:text-medical-primary transition-colors">Analytics</a>
           <a href="#cabang" className="hover:text-medical-primary transition-colors">Multi Cabang</a>
-          <a href="#harga" className="hover:text-medical-primary transition-colors">Harga</a>
         </div>
         <button
           onClick={() => navigate('/admin')}
@@ -637,126 +618,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-24" id="harga">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="text-center mb-16 space-y-4">
-            <h4 className="text-blue-600 text-xs font-black tracking-widest uppercase">Pricing Plans</h4>
-            <h2 className="text-4xl md:text-5xl font-black text-[#172B4D] tracking-tight">Mulai Rp149 Ribuan <br /> Per 3 Bulan</h2>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-            <div className="bg-white border border-slate-200 rounded-3xl p-10 flex flex-col hover:border-blue-200 transition-all">
-              <h3 className="text-xl font-black mb-2 uppercase tracking-tight">Starter Ramah</h3>
-              <div className="flex items-baseline gap-1 mb-8">
-                <span className="text-3xl font-black">Rp149k–199k</span>
-                <span className="text-slate-400 text-xs font-bold">/ 3 bulan</span>
-              </div>
-              <ul className="space-y-4 mb-10 flex-1">
-                <li className="flex items-center gap-2 text-sm text-slate-600 font-medium"><CheckCircle2 size={16} className="text-emerald-500" /> 1 Cabang Klinik</li>
-                <li className="flex items-center gap-2 text-sm text-slate-600 font-medium"><CheckCircle2 size={16} className="text-emerald-500" /> Hingga 3 User</li>
-                <li className="flex items-center gap-2 text-sm text-slate-600 font-medium"><CheckCircle2 size={16} className="text-emerald-500" /> Booking & Jadwal</li>
-                <li className="flex items-center gap-2 text-sm text-slate-600 font-medium"><CheckCircle2 size={16} className="text-emerald-500" /> Rekam Medis Dasar</li>
-                <li className="flex items-center gap-2 text-sm text-slate-600 font-medium"><CheckCircle2 size={16} className="text-emerald-500" /> Support Email</li>
-              </ul>
-              <button
-                onClick={() => handleBuyPackage('Starter Ramah', 149000, '3 bulan', 'Rp149k–199k/3 bulan')}
-                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 rounded-2xl font-black transition-all hover:shadow-lg active:scale-[0.98]"
-              >
-                Pilih Paket
-              </button>
-            </div>
-
-            <div className="bg-white border-4 border-blue-600 rounded-3xl p-10 flex flex-col relative scale-105 shadow-2xl shadow-blue-600/10 z-10">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">Terpopuler</div>
-              <h3 className="text-xl font-black mb-2 uppercase tracking-tight">Growth High Value</h3>
-              <div className="flex items-baseline gap-1 mb-8">
-                <span className="text-3xl font-black">Rp399k–599k</span>
-                <span className="text-slate-400 text-xs font-bold">/ 3 bulan</span>
-              </div>
-              <ul className="space-y-4 mb-10 flex-1">
-                <li className="flex items-center gap-2 text-sm text-slate-700 font-bold"><CheckCircle2 size={16} className="text-emerald-500" /> Hingga 3 Cabang Klinik</li>
-                <li className="flex items-center gap-2 text-sm text-slate-700 font-bold"><CheckCircle2 size={16} className="text-emerald-500" /> Hingga 10 User</li>
-                <li className="flex items-center gap-2 text-sm text-slate-700 font-bold"><CheckCircle2 size={16} className="text-emerald-500" /> Dashboard Konsolidasi</li>
-                <li className="flex items-center gap-2 text-sm text-slate-700 font-bold"><CheckCircle2 size={16} className="text-emerald-500" /> Laporan Keuangan</li>
-                <li className="flex items-center gap-2 text-sm text-slate-700 font-bold"><CheckCircle2 size={16} className="text-emerald-500" /> Support Prioritas</li>
-              </ul>
-              <button
-                onClick={() => handleBuyPackage('Growth High Value', 399000, '3 bulan', 'Rp399k–599k/3 bulan')}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black transition-all shadow-xl shadow-blue-600/20 active:scale-[0.98]"
-              >
-                Ambil Paket Growth
-              </button>
-            </div>
-
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-10 flex flex-col text-white">
-              <h3 className="text-xl font-black mb-2 uppercase tracking-tight">Clinic Premium</h3>
-              <div className="flex items-baseline gap-1 mb-8">
-                <span className="text-3xl font-black">Rp999k–1,5jt</span>
-                <span className="text-slate-400 text-xs font-bold">/ 3 bulan</span>
-              </div>
-              <ul className="space-y-4 mb-10 flex-1">
-                <li className="flex items-center gap-2 text-sm opacity-80 font-medium"><CheckCircle2 size={16} className="text-cyan-400" /> Unlimited Cabang</li>
-                <li className="flex items-center gap-2 text-sm opacity-80 font-medium"><CheckCircle2 size={16} className="text-cyan-400" /> Unlimited User</li>
-                <li className="flex items-center gap-2 text-sm opacity-80 font-medium"><CheckCircle2 size={16} className="text-cyan-400" /> Semua Fitur Premium</li>
-                <li className="flex items-center gap-2 text-sm opacity-80 font-medium"><CheckCircle2 size={16} className="text-cyan-400" /> Dedicated Support</li>
-                <li className="flex items-center gap-2 text-sm opacity-80 font-medium"><CheckCircle2 size={16} className="text-cyan-400" /> Prioritas Update & Fitur Baru</li>
-              </ul>
-              <button
-                onClick={() => window.open('https://wa.me/6281234567890?text=Halo%20saya%20tertarik%20dengan%20paket%20Clinic%20Premium', '_blank')}
-                className="w-full bg-white text-slate-900 py-4 rounded-2xl font-black transition-all hover:bg-slate-100 active:scale-[0.98]"
-              >
-                Hubungi Sales
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Subscription Success Toast */}
-      <AnimatePresence>
-        {subSuccess && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: 50, x: '-50%' }}
-            className="fixed bottom-8 left-1/2 z-[200] bg-medical-secondary text-white px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-4 border border-blue-800/30"
-          >
-            <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-              <PartyPopper size={22} className="text-emerald-400" />
-            </div>
-            <div>
-              <p className="font-black text-sm">Paket Berhasil Diaktifkan! 🎉</p>
-              <p className="text-xs text-white/60 font-medium mt-0.5">Akses paket Anda sudah aktif. Silakan login ke dashboard.</p>
-            </div>
-            <button
-              onClick={() => navigate('/admin')}
-              className="ml-4 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all"
-            >
-              Buka Dashboard
-            </button>
-            <button
-              onClick={() => setSubSuccess(false)}
-              className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Subscription Payment Modal */}
-      {subPayment.pkg && (
-        <PaymentModal
-          isOpen={subPayment.isOpen}
-          onClose={() => setSubPayment({ isOpen: false, pkg: null })}
-          amount={subPayment.pkg.price}
-          invoiceId={`sub-${Date.now()}`}
-          invoiceNumber={`SUB-${Date.now().toString(36).toUpperCase()}`}
-          patientName="Owner Klinik"
-          onPaymentSuccess={(tx) => handleSubPaymentSuccess(tx)}
-        />
-      )}
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-100 py-20 px-8">
